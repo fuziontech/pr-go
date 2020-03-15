@@ -1,8 +1,10 @@
-package analytics
+package pr
 
 import (
 	"encoding/json"
-	"time"
+	"github.com/fuziontech/pr-idl/pb"
+
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 // Values implementing this interface are used by analytics clients to notify
@@ -52,22 +54,14 @@ func makeMessageId(id string, def string) string {
 
 // Returns the time value passed as first argument, unless it's the zero-value,
 // in that case the default value passed as second argument is returned.
-func makeTimestamp(t time.Time, def time.Time) time.Time {
-	if t == (time.Time{}) {
+func makeTimestamp(t *timestamp.Timestamp, def *timestamp.Timestamp) *timestamp.Timestamp {
+	if t.Nanos == 0 {
 		return def
 	}
 	return t
 }
 
-// This structure represents objects sent to the /v1/batch endpoint. We don't
-// export this type because it's only meant to be used internally to send groups
-// of messages in one API call.
-type batch struct {
-	MessageId string    `json:"messageId"`
-	SentAt    time.Time `json:"sentAt"`
-	Messages  []message `json:"batch"`
-	Context   *Context  `json:"context"`
-}
+type batch pb.Batch
 
 type message struct {
 	msg  Message

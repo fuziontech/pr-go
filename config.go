@@ -1,9 +1,12 @@
-package analytics
+package pr
 
 import (
 	"net/http"
 	"time"
 
+	"github.com/fuziontech/pr-idl/pb"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/segmentio/backo-go"
 	"github.com/xtgo/uuid"
 )
@@ -71,7 +74,7 @@ type Config struct {
 	// used by default.
 	// This field is not exported and only exposed internally to let unit tests
 	// mock the current time.
-	now func() time.Time
+	now func() *timestamp.Timestamp
 
 	// The maximum number of goroutines that will be spawned by a client to send
 	// requests to the backend API.
@@ -82,7 +85,7 @@ type Config struct {
 
 // This constant sets the default endpoint to which client instances send
 // messages if none was explictly set.
-const DefaultEndpoint = "https://api.segment.io"
+const DefaultEndpoint = "https://api.navcom.app"
 
 // This constant sets the default flush interval used by client instances if
 // none was explicitly set.
@@ -150,7 +153,7 @@ func makeConfig(c Config) Config {
 	}
 
 	if c.now == nil {
-		c.now = time.Now
+		c.now = ptypes.TimestampNow
 	}
 
 	if c.maxConcurrentRequests == 0 {
@@ -159,8 +162,8 @@ func makeConfig(c Config) Config {
 
 	// We always overwrite the 'library' field of the default context set on the
 	// client because we want this information to be accurate.
-	c.DefaultContext.Library = LibraryInfo{
-		Name:    "analytics-go",
+	c.DefaultContext.Library = &pb.LibraryInfo{
+		Name:    "pr-go",
 		Version: Version,
 	}
 	return c

@@ -1,23 +1,10 @@
-package analytics
+package pr
 
-import "time"
+import (
+	"github.com/fuziontech/pr-idl/pb"
+)
 
-var _ Message = (*Alias)(nil)
-
-// This type represents object sent in a alias call as described in
-// https://segment.com/docs/libraries/http/#alias
-type Alias struct {
-	// This field is exported for serialization purposes and shouldn't be set by
-	// the application, its value is always overwritten by the library.
-	Type string `json:"type,omitempty"`
-
-	MessageId    string       `json:"messageId,omitempty"`
-	PreviousId   string       `json:"previousId"`
-	UserId       string       `json:"userId"`
-	Timestamp    time.Time    `json:"timestamp,omitempty"`
-	Context      *Context     `json:"context,omitempty"`
-	Integrations Integrations `json:"integrations,omitempty"`
-}
+type Alias pb.Alias
 
 func (msg Alias) internal() {
 	panic(unimplementedError)

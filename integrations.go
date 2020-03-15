@@ -1,4 +1,6 @@
-package analytics
+package pr
+
+import "github.com/fuziontech/pr-idl/pb"
 
 // This type is used to represent integrations in messages that support it.
 // It is a free-form where values are most often booleans that enable or
@@ -14,10 +16,10 @@ package analytics
 //	}
 //
 // The specifications can be found at https://segment.com/docs/spec/common/#integrations
-type Integrations map[string]interface{}
+type Integrations pb.Integrations
 
 func NewIntegrations() Integrations {
-	return make(Integrations, 10)
+	return Integrations{}
 }
 
 func (i Integrations) EnableAll() Integrations {
@@ -38,7 +40,12 @@ func (i Integrations) Disable(name string) Integrations {
 
 // Sets an integration named by the first argument to the specified value, any
 // value other than `false` will be interpreted as enabling the integration.
-func (i Integrations) Set(name string, value interface{}) Integrations {
-	i[name] = value
+func (i Integrations) Set(name string, value bool) Integrations {
+	i.Integrations[name] = value
 	return i
+}
+
+func (i Integrations) ToPB() *pb.Integrations {
+	out := pb.Integrations(i)
+	return &out
 }

@@ -1,13 +1,14 @@
-package analytics
+package pr
 
 import (
 	"encoding/json"
 	"testing"
+	"github.com/fuziontech/pr-idl/pb"
 )
 
 func TestContextMarshalJSONLibrary(t *testing.T) {
 	c := Context{
-		Library: LibraryInfo{
+		Library: &pb.LibraryInfo{
 			Name: "testing",
 		},
 	}
@@ -22,8 +23,8 @@ func TestContextMarshalJSONLibrary(t *testing.T) {
 
 func TestContextMarshalJSONExtra(t *testing.T) {
 	c := Context{
-		Extra: map[string]interface{}{
-			"answer": 42,
+		ExtraFields: map[string]string{
+			"answer": "42",
 		},
 	}
 

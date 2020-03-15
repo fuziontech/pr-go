@@ -1,6 +1,6 @@
 // +build !go1.6
 
-package analytics
+package pr
 
 import "net/http"
 

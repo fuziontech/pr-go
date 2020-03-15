@@ -1,4 +1,4 @@
-package analytics
+package pr
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+	"github.com/fuziontech/pr-idl/pb"
 )
 
 // Version of the client.
@@ -243,15 +244,17 @@ func (c *client) sendAsync(msgs []message, wg *sync.WaitGroup, ex *executor) {
 	}
 }
 
+
 // Send batch request.
 func (c *client) send(msgs []message) {
 	const attempts = 10
 
+	ctx := pb.Context(*c.DefaultContext)
 	b, err := json.Marshal(batch{
 		MessageId: c.uid(),
 		SentAt:    c.now(),
-		Messages:  msgs,
-		Context:   c.DefaultContext,
+		//Messages:  msgs,
+		Context:   &ctx,
 	})
 
 	if err != nil {
@@ -406,10 +409,11 @@ func (c *client) errorf(format string, args ...interface{}) {
 }
 
 func (c *client) maxBatchBytes() int {
+	ctx := pb.Context(*c.DefaultContext)
 	b, _ := json.Marshal(batch{
 		MessageId: c.uid(),
 		SentAt:    c.now(),
-		Context:   c.DefaultContext,
+		Context:   &ctx,
 	})
 	return maxBatchBytes - len(b)
 }

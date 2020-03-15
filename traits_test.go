@@ -1,6 +1,7 @@
-package analytics
+package pr
 
 import (
+	"github.com/golang/protobuf/ptypes"
 	"reflect"
 	"testing"
 	"time"
@@ -11,25 +12,27 @@ func TestTraitsSimple(t *testing.T) {
 	text := "ABC"
 	number := 42
 
+	pbdate, _ := ptypes.TimestampProto(date)
+
 	tests := map[string](struct {
 		ref Traits
 		run func(Traits)
 	}){
-		"address":     {Traits{"address": text}, func(t Traits) { t.SetAddress(text) }},
-		"age":         {Traits{"age": number}, func(t Traits) { t.SetAge(number) }},
-		"avatar":      {Traits{"avatar": text}, func(t Traits) { t.SetAvatar(text) }},
-		"birthday":    {Traits{"birthday": date}, func(t Traits) { t.SetBirthday(date) }},
-		"createdAt":   {Traits{"createdAt": date}, func(t Traits) { t.SetCreatedAt(date) }},
-		"description": {Traits{"description": text}, func(t Traits) { t.SetDescription(text) }},
-		"email":       {Traits{"email": text}, func(t Traits) { t.SetEmail(text) }},
-		"firstName":   {Traits{"firstName": text}, func(t Traits) { t.SetFirstName(text) }},
-		"lastName":    {Traits{"lastName": text}, func(t Traits) { t.SetLastName(text) }},
-		"gender":      {Traits{"gender": text}, func(t Traits) { t.SetGender(text) }},
-		"name":        {Traits{"name": text}, func(t Traits) { t.SetName(text) }},
-		"phone":       {Traits{"phone": text}, func(t Traits) { t.SetPhone(text) }},
-		"title":       {Traits{"title": text}, func(t Traits) { t.SetTitle(text) }},
-		"username":    {Traits{"username": text}, func(t Traits) { t.SetUsername(text) }},
-		"website":     {Traits{"website": text}, func(t Traits) { t.SetWebsite(text) }},
+		"address":     {Traits{Address: text}, func(t Traits) { t.SetAddress(text) }},
+		"age":         {Traits{Age: int32(number)}, func(t Traits) { t.SetAge(number) }},
+		"avatar":      {Traits{Avatar: text}, func(t Traits) { t.SetAvatar(text) }},
+		"birthday":    {Traits{Birthday: pbdate}, func(t Traits) { t.SetBirthday(date) }},
+		"createdAt":   {Traits{CreatedAt: pbdate}, func(t Traits) { t.SetCreatedAt(date) }},
+		"description": {Traits{Description: text}, func(t Traits) { t.SetDescription(text) }},
+		"email":       {Traits{Email: text}, func(t Traits) { t.SetEmail(text) }},
+		"firstName":   {Traits{FirstName: text}, func(t Traits) { t.SetFirstName(text) }},
+		"lastName":    {Traits{LastName: text}, func(t Traits) { t.SetLastName(text) }},
+		"gender":      {Traits{Gender: text}, func(t Traits) { t.SetGender(text) }},
+		"name":        {Traits{Name: text}, func(t Traits) { t.SetName(text) }},
+		"phone":       {Traits{Phone: text}, func(t Traits) { t.SetPhone(text) }},
+		"title":       {Traits{Title: text}, func(t Traits) { t.SetTitle(text) }},
+		"username":    {Traits{Username: text}, func(t Traits) { t.SetUsername(text) }},
+		"website":     {Traits{Website: text}, func(t Traits) { t.SetWebsite(text) }},
 	}
 
 	for name, test := range tests {
@@ -43,7 +46,7 @@ func TestTraitsSimple(t *testing.T) {
 }
 
 func TestTraitsMulti(t *testing.T) {
-	t0 := Traits{"firstName": "Luke", "lastName": "Skywalker"}
+	t0 := Traits{FirstName: "Luke", LastName: "Skywalker"}
 	t1 := NewTraits().SetFirstName("Luke").SetLastName("Skywalker")
 
 	if !reflect.DeepEqual(t0, t1) {

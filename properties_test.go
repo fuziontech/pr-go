@@ -1,4 +1,4 @@
-package analytics
+package pr
 
 import (
 	"reflect"
@@ -10,14 +10,14 @@ func TestPropertiesSimple(t *testing.T) {
 	number := 0.5
 	products := []Product{
 		Product{
-			ID:    "1",
-			SKU:   "1",
+			Id:    "1",
+			Sku:   "1",
 			Name:  "A",
 			Price: 42.0,
 		},
 		Product{
-			ID:    "2",
-			SKU:   "2",
+			Id:    "2",
+			Sku:   "2",
 			Name:  "B",
 			Price: 100.0,
 		},
@@ -27,27 +27,27 @@ func TestPropertiesSimple(t *testing.T) {
 		ref Properties
 		run func(Properties)
 	}{
-		"revenue":  {Properties{"revenue": number}, func(p Properties) { p.SetRevenue(number) }},
-		"currency": {Properties{"currency": text}, func(p Properties) { p.SetCurrency(text) }},
-		"value":    {Properties{"value": number}, func(p Properties) { p.SetValue(number) }},
-		"path":     {Properties{"path": text}, func(p Properties) { p.SetPath(text) }},
-		"referrer": {Properties{"referrer": text}, func(p Properties) { p.SetReferrer(text) }},
-		"title":    {Properties{"title": text}, func(p Properties) { p.SetTitle(text) }},
-		"url":      {Properties{"url": text}, func(p Properties) { p.SetURL(text) }},
-		"name":     {Properties{"name": text}, func(p Properties) { p.SetName(text) }},
-		"category": {Properties{"category": text}, func(p Properties) { p.SetCategory(text) }},
-		"sku":      {Properties{"sku": text}, func(p Properties) { p.SetSKU(text) }},
-		"price":    {Properties{"price": number}, func(p Properties) { p.SetPrice(number) }},
-		"id":       {Properties{"id": text}, func(p Properties) { p.SetProductId(text) }},
-		"orderId":  {Properties{"orderId": text}, func(p Properties) { p.SetOrderId(text) }},
-		"total":    {Properties{"total": number}, func(p Properties) { p.SetTotal(number) }},
-		"subtotal": {Properties{"subtotal": number}, func(p Properties) { p.SetSubtotal(number) }},
-		"shipping": {Properties{"shipping": number}, func(p Properties) { p.SetShipping(number) }},
-		"tax":      {Properties{"tax": number}, func(p Properties) { p.SetTax(number) }},
-		"discount": {Properties{"discount": number}, func(p Properties) { p.SetDiscount(number) }},
-		"coupon":   {Properties{"coupon": text}, func(p Properties) { p.SetCoupon(text) }},
-		"products": {Properties{"products": products}, func(p Properties) { p.SetProducts(products...) }},
-		"repeat":   {Properties{"repeat": true}, func(p Properties) { p.SetRepeat(true) }},
+		"revenue":  {Properties{Revenue: number}, func(p Properties) { p.SetRevenue(number) }},
+		"currency": {Properties{Currency: text}, func(p Properties) { p.SetCurrency(text) }},
+		"value":    {Properties{Value: number}, func(p Properties) { p.SetValue(number) }},
+		"path":     {Properties{Path: text}, func(p Properties) { p.SetPath(text) }},
+		"referrer": {Properties{Referrer: text}, func(p Properties) { p.SetReferrer(text) }},
+		"title":    {Properties{Title: text}, func(p Properties) { p.SetTitle(text) }},
+		"url":      {Properties{Url: text}, func(p Properties) { p.SetURL(text) }},
+		"name":     {Properties{Name: text}, func(p Properties) { p.SetName(text) }},
+		"category": {Properties{Category: text}, func(p Properties) { p.SetCategory(text) }},
+		"sku":      {Properties{Sku: text}, func(p Properties) { p.SetSKU(text) }},
+		"price":    {Properties{Price: number}, func(p Properties) { p.SetPrice(number) }},
+		"id":       {Properties{Id: text}, func(p Properties) { p.SetProductId(text) }},
+		"orderId":  {Properties{OrderId: text}, func(p Properties) { p.SetOrderId(text) }},
+		"total":    {Properties{Total: number}, func(p Properties) { p.SetTotal(number) }},
+		"subtotal": {Properties{Subtotal: number}, func(p Properties) { p.SetSubtotal(number) }},
+		"shipping": {Properties{Shipping: number}, func(p Properties) { p.SetShipping(number) }},
+		"tax":      {Properties{Tax: number}, func(p Properties) { p.SetTax(number) }},
+		"discount": {Properties{Discount: number}, func(p Properties) { p.SetDiscount(number) }},
+		"coupon":   {Properties{Coupon: text}, func(p Properties) { p.SetCoupon(text) }},
+		"products": {Properties{Products: pointyProductSlice(products)}, func(p Properties) { p.SetProducts(products...) }},
+		"repeat":   {Properties{Repeat: true}, func(p Properties) { p.SetRepeat(true) }},
 	}
 
 	for name, test := range tests {
@@ -61,7 +61,7 @@ func TestPropertiesSimple(t *testing.T) {
 }
 
 func TestPropertiesMulti(t *testing.T) {
-	p0 := Properties{"title": "A", "value": 0.5}
+	p0 := Properties{Title: "A", Value: 0.5}
 	p1 := NewProperties().SetTitle("A").SetValue(0.5)
 
 	if !reflect.DeepEqual(p0, p1) {

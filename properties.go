@@ -1,4 +1,6 @@
-package analytics
+package pr
+
+import "github.com/fuziontech/pr-idl/pb"
 
 // This type is used to represent properties in messages that support it.
 // It is a free-form object so the application can set any value it sees fit but
@@ -13,105 +15,140 @@ package analytics
 //			.SetCurrency("USD"),
 //	}
 //
-type Properties map[string]interface{}
+type Properties pb.Properties
 
 func NewProperties() Properties {
-	return make(Properties, 10)
+	return Properties{}
 }
 
 func (p Properties) SetRevenue(revenue float64) Properties {
-	return p.Set("revenue", revenue)
-}
-
-func (p Properties) SetCurrency(currency string) Properties {
-	return p.Set("currency", currency)
-}
-
-func (p Properties) SetValue(value float64) Properties {
-	return p.Set("value", value)
-}
-
-func (p Properties) SetPath(path string) Properties {
-	return p.Set("path", path)
-}
-
-func (p Properties) SetReferrer(referrer string) Properties {
-	return p.Set("referrer", referrer)
-}
-
-func (p Properties) SetTitle(title string) Properties {
-	return p.Set("title", title)
-}
-
-func (p Properties) SetURL(url string) Properties {
-	return p.Set("url", url)
-}
-
-func (p Properties) SetName(name string) Properties {
-	return p.Set("name", name)
-}
-
-func (p Properties) SetCategory(category string) Properties {
-	return p.Set("category", category)
-}
-
-func (p Properties) SetSKU(sku string) Properties {
-	return p.Set("sku", sku)
-}
-
-func (p Properties) SetPrice(price float64) Properties {
-	return p.Set("price", price)
-}
-
-func (p Properties) SetProductId(id string) Properties {
-	return p.Set("id", id)
-}
-
-func (p Properties) SetOrderId(id string) Properties {
-	return p.Set("orderId", id)
-}
-
-func (p Properties) SetTotal(total float64) Properties {
-	return p.Set("total", total)
-}
-
-func (p Properties) SetSubtotal(subtotal float64) Properties {
-	return p.Set("subtotal", subtotal)
-}
-
-func (p Properties) SetShipping(shipping float64) Properties {
-	return p.Set("shipping", shipping)
-}
-
-func (p Properties) SetTax(tax float64) Properties {
-	return p.Set("tax", tax)
-}
-
-func (p Properties) SetDiscount(discount float64) Properties {
-	return p.Set("discount", discount)
-}
-
-func (p Properties) SetCoupon(coupon string) Properties {
-	return p.Set("coupon", coupon)
-}
-
-func (p Properties) SetProducts(products ...Product) Properties {
-	return p.Set("products", products)
-}
-
-func (p Properties) SetRepeat(repeat bool) Properties {
-	return p.Set("repeat", repeat)
-}
-
-func (p Properties) Set(name string, value interface{}) Properties {
-	p[name] = value
+	p.Revenue = revenue
 	return p
 }
 
-// This type represents products in the E-commerce API.
-type Product struct {
-	ID    string  `json:"id,omitempty"`
-	SKU   string  `json:"sky,omitempty"`
-	Name  string  `json:"name,omitempty"`
-	Price float64 `json:"price"`
+func (p Properties) SetCurrency(currency string) Properties {
+	p.Currency = currency
+	return p
+}
+
+func (p Properties) SetValue(value float64) Properties {
+	p.Value = value
+	return p
+}
+
+func (p Properties) SetPath(path string) Properties {
+	p.Path = path
+	return p
+}
+
+func (p Properties) SetReferrer(referrer string) Properties {
+	p.Referrer = referrer
+	return p
+}
+
+func (p Properties) SetTitle(title string) Properties {
+	p.Title = title
+	return p
+}
+
+func (p Properties) SetURL(url string) Properties {
+	p.Url = url
+	return p
+}
+
+func (p Properties) SetName(name string) Properties {
+	p.Name = name
+	return p
+}
+
+func (p Properties) SetCategory(category string) Properties {
+	p.Category = category
+	return p
+}
+
+func (p Properties) SetSKU(sku string) Properties {
+	p.Sku = sku
+	return p
+}
+
+func (p Properties) SetPrice(price float64) Properties {
+	p.Price = price
+	return p
+}
+
+func (p Properties) SetProductId(id string) Properties {
+	p.ProductId = id
+	return p
+}
+
+func (p Properties) SetOrderId(id string) Properties {
+	p.OrderId = p.OrderId
+	return p
+}
+
+func (p Properties) SetTotal(total float64) Properties {
+	p.Total = total
+	return p
+}
+
+func (p Properties) SetSubtotal(subtotal float64) Properties {
+	p.Subtotal = subtotal
+	return p
+}
+
+func (p Properties) SetShipping(shipping float64) Properties {
+	p.Shipping = shipping
+	return p
+}
+
+func (p Properties) SetTax(tax float64) Properties {
+	p.Tax = tax
+	return p
+}
+
+func (p Properties) SetDiscount(discount float64) Properties {
+	p.Discount = discount
+	return p
+}
+
+func (p Properties) SetCoupon(coupon string) Properties {
+	p.Coupon = coupon
+	return p
+}
+
+func (p Properties) SetProducts(products ...Product) Properties {
+	pointyProducts := pointyProductSlice(products)
+	p.Products = pointyProducts
+	return p
+}
+
+func (p Properties) SetRepeat(repeat bool) Properties {
+	p.Repeat = repeat
+	return p
+}
+
+func (p Properties) Set(name string, value string) Properties {
+	p.ExtraFields[name] = value
+	return p
+}
+
+func (p Properties) ToPB() *pb.Properties {
+	out := pb.Properties(p)
+	return &out
+}
+
+type Product pb.Product
+
+func (p Product) ToPB() *pb.Product {
+	out := pb.Product(p)
+	return &out
+}
+
+func pointyProductSlice(in []Product) []*pb.Product {
+	var out []*pb.Product
+	for _, v := range in {
+		pbp := pb.Product(v)
+		out = append(out, &pbp)
+	}
+	return out
 }

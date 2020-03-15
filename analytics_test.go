@@ -1,10 +1,12 @@
-package analytics
+package pr
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -146,9 +148,11 @@ func fixture(name string) string {
 
 func mockId() string { return "I'm unique" }
 
-func mockTime() time.Time {
+func mockTime() *timestamp.Timestamp {
 	// time.Unix(0, 0) fails on Circle
-	return time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	fakeTime := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	protoFake, _ := ptypes.TimestampProto(fakeTime)
+	return protoFake
 }
 
 func mockServer() (chan []byte, *httptest.Server) {
@@ -191,10 +195,12 @@ func ExampleTrack() {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
 	})
 
 	fmt.Printf("%s\n", <-body)
@@ -261,10 +267,12 @@ func TestEnqueue(t *testing.T) {
 				Event:  "Download",
 				UserId: "123456",
 				Properties: Properties{
-					"application": "Segment Desktop",
-					"version":     "1.1.0",
-					"platform":    "osx",
-				},
+					ExtraFields: map[string]string{
+						"application": "Segment Desktop",
+						"version":     "1.1.0",
+						"platform":    "osx",
+					},
+				}.ToPB(),
 			},
 		},
 		"*alias": {
@@ -298,10 +306,12 @@ func TestEnqueue(t *testing.T) {
 				Event:  "Download",
 				UserId: "123456",
 				Properties: Properties{
-					"application": "Segment Desktop",
-					"version":     "1.1.0",
-					"platform":    "osx",
-				},
+					ExtraFields: map[string]string{
+						"application": "Segment Desktop",
+						"version":     "1.1.0",
+						"platform":    "osx",
+					},
+				}.ToPB(),
 			},
 		},
 	}
@@ -375,10 +385,12 @@ func TestTrackWithInterval(t *testing.T) {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
 	})
 
 	// Will flush in 100 milliseconds
@@ -411,11 +423,13 @@ func TestTrackWithTimestamp(t *testing.T) {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
-		Timestamp: time.Date(2015, time.July, 10, 23, 0, 0, 0, time.UTC),
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
+		Timestamp: TsToPbTs(time.Date(2015, time.July, 10, 23, 0, 0, 0, time.UTC)),
 	})
 
 	if res := string(<-body); ref != res {
@@ -443,10 +457,12 @@ func TestTrackWithMessageId(t *testing.T) {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
 		MessageId: "abc",
 	})
 
@@ -475,15 +491,17 @@ func TestTrackWithContext(t *testing.T) {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
-		Context: &Context{
-			Extra: map[string]interface{}{
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
+		Context: Context{
+			ExtraFields: map[string]string{
 				"whatever": "here",
 			},
-		},
+		}.ToPB(),
 	})
 
 	if res := string(<-body); ref != res {
@@ -512,9 +530,11 @@ func TestTrackMany(t *testing.T) {
 			Event:  "Download",
 			UserId: "123456",
 			Properties: Properties{
-				"application": "Segment Desktop",
-				"version":     i,
-			},
+				ExtraFields: map[string]string{
+					"application": "Segment Desktop",
+					"version":     string(i),
+				},
+			}.ToPB(),
 		})
 	}
 
@@ -543,15 +563,19 @@ func TestTrackWithIntegrations(t *testing.T) {
 		Event:  "Download",
 		UserId: "123456",
 		Properties: Properties{
-			"application": "Segment Desktop",
-			"version":     "1.1.0",
-			"platform":    "osx",
-		},
+			ExtraFields: map[string]string{
+				"application": "Segment Desktop",
+				"version":     "1.1.0",
+				"platform":    "osx",
+			},
+		}.ToPB(),
 		Integrations: Integrations{
-			"All":      true,
-			"Intercom": false,
-			"Mixpanel": true,
-		},
+			Integrations: map[string]bool{
+				"All":      true,
+				"Intercom": false,
+				"Mixpanel": true,
+			},
+		}.ToPB(),
 	})
 
 	if res := string(<-body); ref != res {
@@ -626,64 +650,6 @@ func TestClientCallback(t *testing.T) {
 	case <-reschan:
 	case err := <-errchan:
 		t.Error("failure callback triggered:", err)
-	}
-}
-
-func TestClientMarshalMessageError(t *testing.T) {
-	errchan := make(chan error, 1)
-
-	client, _ := NewWithConfig("0123456789", Config{
-		Logger: testLogger{t.Logf, t.Logf},
-		Callback: testCallback{
-			nil,
-			func(m Message, e error) { errchan <- e },
-		},
-		Transport: testTransportOK,
-	})
-
-	// Functions cannot be serializable, this should break the JSON marshaling
-	// and trigger the failure callback.
-	client.Enqueue(Track{
-		UserId:     "A",
-		Event:      "B",
-		Properties: Properties{"invalid": func() {}},
-	})
-	client.Close()
-
-	if err := <-errchan; err == nil {
-		t.Error("failure callback not triggered for unserializable message")
-
-	} else if _, ok := err.(*json.UnsupportedTypeError); !ok {
-		t.Errorf("invalid error type returned by unserializable message: %T", err)
-	}
-}
-
-func TestClientMarshalContextError(t *testing.T) {
-	errchan := make(chan error, 1)
-
-	client, _ := NewWithConfig("0123456789", Config{
-		Logger: testLogger{t.Logf, t.Logf},
-		Callback: testCallback{
-			nil,
-			func(m Message, e error) { errchan <- e },
-		},
-		DefaultContext: &Context{
-			// The context set on the batch message is invalid this should also
-			// cause the batched message to fail to be serialized and call the
-			// failure callback.
-			Extra: map[string]interface{}{"invalid": func() {}},
-		},
-		Transport: testTransportOK,
-	})
-
-	client.Enqueue(Track{UserId: "A", Event: "B"})
-	client.Close()
-
-	if err := <-errchan; err == nil {
-		t.Error("failure callback not triggered for unserializable context")
-
-	} else if _, ok := err.(*json.MarshalerError); !ok {
-		t.Errorf("invalid error type returned by unserializable context: %T", err)
 	}
 }
 

@@ -1,6 +1,9 @@
-package analytics
+package pr
 
-import "time"
+import (
+	"github.com/fuziontech/pr-idl/pb"
+	"time"
+)
 
 // This type is used to represent traits in messages that support it.
 // It is a free-form object so the application can set any value it sees fit but
@@ -17,73 +20,89 @@ import "time"
 //	}
 //
 // The specifications can be found at https://segment.com/docs/spec/identify/#traits
-type Traits map[string]interface{}
+
+type Traits pb.Traits
 
 func NewTraits() Traits {
-	return make(Traits, 10)
+	return Traits{}
 }
 
 func (t Traits) SetAddress(address string) Traits {
-	return t.Set("address", address)
+	t.Address = address
+	return t
 }
 
 func (t Traits) SetAge(age int) Traits {
-	return t.Set("age", age)
+	t.Age = int32(age)
+	return t
 }
 
 func (t Traits) SetAvatar(url string) Traits {
-	return t.Set("avatar", url)
+	t.Avatar = url
+	return t
 }
 
 func (t Traits) SetBirthday(date time.Time) Traits {
-	return t.Set("birthday", date)
+	//t.Birthday, _ = ptypes.TimestampProto(date)
+	return t
 }
 
 func (t Traits) SetCreatedAt(date time.Time) Traits {
-	return t.Set("createdAt", date)
+	//t.CreatedAt, _ = ptypes.TimestampProto(date)
+	return t
 }
 
 func (t Traits) SetDescription(desc string) Traits {
-	return t.Set("description", desc)
+	t.Description = desc
+	return t
 }
 
 func (t Traits) SetEmail(email string) Traits {
-	return t.Set("email", email)
+	t.Email = email
+	return t
 }
 
 func (t Traits) SetFirstName(firstName string) Traits {
-	return t.Set("firstName", firstName)
+	t.FirstName = firstName
+	return t
 }
 
 func (t Traits) SetGender(gender string) Traits {
-	return t.Set("gender", gender)
+	t.Gender = gender
+	return t
 }
 
 func (t Traits) SetLastName(lastName string) Traits {
-	return t.Set("lastName", lastName)
+	t.LastName = lastName
+	return t
 }
 
 func (t Traits) SetName(name string) Traits {
-	return t.Set("name", name)
+	t.Name = name
+	return t
 }
 
 func (t Traits) SetPhone(phone string) Traits {
-	return t.Set("phone", phone)
+	t.Phone = phone
+	return t
 }
 
 func (t Traits) SetTitle(title string) Traits {
-	return t.Set("title", title)
+	t.Title = title
+	return t
 }
 
 func (t Traits) SetUsername(username string) Traits {
-	return t.Set("username", username)
+	t.Username = username
+	return t
 }
 
 func (t Traits) SetWebsite(url string) Traits {
-	return t.Set("website", url)
+	t.Website = url
+	return t
 }
 
-func (t Traits) Set(field string, value interface{}) Traits {
-	t[field] = value
+func (t Traits) Set(field string, value string) Traits {
+	t.ExtraFields[field] = value
 	return t
 }

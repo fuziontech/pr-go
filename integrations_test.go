@@ -1,4 +1,4 @@
-package analytics
+package pr
 
 import (
 	"reflect"
@@ -6,7 +6,10 @@ import (
 )
 
 func TestIntegrationsEnableAll(t *testing.T) {
-	i0 := Integrations{"all": true}
+	i0 := Integrations{
+		Integrations: map[string]bool{
+			"all": true,
+		}}
 	i1 := NewIntegrations().EnableAll()
 
 	if !reflect.DeepEqual(i0, i1) {
@@ -15,7 +18,10 @@ func TestIntegrationsEnableAll(t *testing.T) {
 }
 
 func TestIntegrationsDisableAll(t *testing.T) {
-	i0 := Integrations{"all": false}
+	i0 := Integrations{
+		Integrations: map[string]bool{
+			"all": false,
+		}}
 	i1 := NewIntegrations().DisableAll()
 
 	if !reflect.DeepEqual(i0, i1) {
